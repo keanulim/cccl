@@ -20,6 +20,7 @@
 #  pragma system_header
 #endif // no system header
 
+#include <cuda/std/__concepts/concept_macros.h>
 #include <cuda/std/__type_traits/is_same.h>
 
 #include <cuda/std/__cccl/prologue.h>
@@ -29,7 +30,7 @@ _CCCL_BEGIN_NAMESPACE_CUDA_STD
 #ifdef _CCCL_BUILTIN_IS_REFERENCEABLE
 
 template <class _Tp>
-inline constexpr bool __can_reference = _CCCL_BUILTIN_IS_REFERENCEABLE(_Tp);
+_CCCL_CONCEPT __can_reference = _CCCL_BUILTIN_IS_REFERENCEABLE(_Tp);
 
 #else // ^^^ have __is_referenceable ^^^ / vvv no builtin vvv
 
@@ -42,7 +43,7 @@ template <class _Tp>
 _CCCL_API __false_tag __cccl_test_is_referenceable(...);
 
 template <class _Tp>
-inline constexpr bool __can_reference = !is_same_v<decltype(__cccl_test_is_referenceable<_Tp>(0)), __false_tag>;
+_CCCL_CONCEPT __can_reference = !is_same_v<decltype(__cccl_test_is_referenceable<_Tp>(0)), __false_tag>;
 
 // template <class _Tp>
 // using __with_reference = _Tp&;
