@@ -59,7 +59,9 @@ _CCCL_API constexpr pair<remove_cvref_t<_InIter1>, remove_cvref_t<_OutIter>> __s
     }
   }
   return ::cuda::std::__copy<_AlgPolicy>(
-    ::cuda::std::move(__first1), ::cuda::std::move(__last1), ::cuda::std::move(__result));
+    ::cuda::std::move(__first1), // NOLINT(bugprone-move-forwarding-reference)
+    ::cuda::std::move(__last1), // NOLINT(bugprone-move-forwarding-reference)
+    ::cuda::std::move(__result)); // NOLINT(bugprone-move-forwarding-reference)
 }
 
 template <class _InputIterator1, class _InputIterator2, class _OutputIterator, class _Compare>
