@@ -439,7 +439,7 @@ struct policy_selector
   [[nodiscard]] _CCCL_HOST_DEVICE_API constexpr auto get_two_phase_tuning(::cuda::compute_capability cc) const
     -> ReducePolicy
   {
-    if (cc >= ::cuda::compute_capability{10, 7})
+    if (cc >= ::cuda::compute_capability{10, 7} && cc < ::cuda::compute_capability{11, 0})
     {
       // sm_107 values are raw measured values and are deliberately NOT passed through scale_mem_bound
       if (const auto sm107_tuning = get_sm107_tuning(accum_t, operation_t, offset_size, accum_size))
