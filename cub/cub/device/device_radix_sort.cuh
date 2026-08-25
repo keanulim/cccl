@@ -245,9 +245,9 @@ private:
     NumItemsT num_items,
     DecomposerT decomposer,
     cudaStream_t stream,
-    ::cuda::std::optional<::cuda::execution::runs_on> runs_on_guarantee,
-    TuningEnvT tuning_env  = {},
-    int begin_bit          = 0,
+    ::cuda::std::optional<::cuda::execution::runs_on> runs_on_guarantee = {},
+    TuningEnvT tuning_env                                               = {},
+    int begin_bit                                                       = 0,
     int end_bit            = detail::radix::traits_t<KeyT>::default_end_bit(DecomposerT{}),
     bool is_overwrite_okay = true)
   {
@@ -293,10 +293,10 @@ private:
     NumItemsT num_items,
     DecomposerT decomposer,
     cudaStream_t stream,
-    ::cuda::std::optional<::cuda::execution::runs_on> runs_on_guarantee,
-    TuningEnvT tuning_env = {},
-    int begin_bit         = 0,
-    int end_bit           = detail::radix::traits_t<KeyT>::default_end_bit(DecomposerT{}))
+    ::cuda::std::optional<::cuda::execution::runs_on> runs_on_guarantee = {},
+    TuningEnvT tuning_env                                               = {},
+    int begin_bit                                                       = 0,
+    int end_bit = detail::radix::traits_t<KeyT>::default_end_bit(DecomposerT{}))
   {
     // We cast away const-ness, but will *not* write to these arrays. ``DispatchRadixSort::Dispatch`` will allocate
     // temporary storage and create a new double-buffer internally when the ``is_overwrite_ok`` flag is not set.
@@ -3572,8 +3572,7 @@ public:
       static_cast<NullType*>(nullptr),
       num_items,
       decomposer,
-      stream,
-      /*runs_on_guarantee=*/::cuda::std::nullopt);
+      stream);
   }
 
   //! @rst
