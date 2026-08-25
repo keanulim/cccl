@@ -3572,7 +3572,8 @@ public:
       static_cast<NullType*>(nullptr),
       num_items,
       decomposer,
-      stream);
+      stream,
+      /*runs_on_guarantee=*/::cuda::std::nullopt);
   }
 
   //! @rst
