@@ -247,6 +247,41 @@ get_sm100_tuning(type_t accum_t, op_kind_t operation_t, int offset_size, int acc
   return {};
 }
 
+// tunings from cub/benchmarks/bench/reduce/sum.cu. Unlike the sm100 values above, these are raw measured values
+// and must not be passed through scale_mem_bound.
+_CCCL_HOST_DEVICE_API constexpr auto
+get_sm107_tuning(type_t accum_t, op_kind_t operation_t, int offset_size, int accum_size)
+  -> ::cuda::std::optional<sm100_tuning_values>
+{
+  if (operation_t != op_kind_t::plus)
+  {
+    // for min or max, verification showed the benefits were too small (within noise)
+    return {};
+  }
+
+  if (accum_t == type_t::float64 && offset_size == 4 && accum_size == 8)
+  {
+    // ipt_17.tpb_192.ipv_2  1.128568  1.062323  1.127248  1.197567
+    return sm100_tuning_values{17, 192, 2};
+  }
+  if (accum_t == type_t::float64 && offset_size == 8 && accum_size == 8)
+  {
+    // ipt_19.tpb_256.ipv_1  1.077322  1.048921  1.086155  1.172982
+    return sm100_tuning_values{19, 256, 1};
+  }
+  if ((accum_t == type_t::int64 || accum_t == type_t::uint64) && offset_size == 4 && accum_size == 8)
+  {
+    // ipt_24.tpb_448.ipv_1  1.106178  1.039921  1.108836  1.150000
+    return sm100_tuning_values{24, 448, 1};
+  }
+  if ((accum_t == type_t::int64 || accum_t == type_t::uint64) && offset_size == 8 && accum_size == 8)
+  {
+    // ipt_19.tpb_448.ipv_2  1.075765  1.028160  1.083034  1.142857
+    return sm100_tuning_values{19, 448, 2};
+  }
+  return {};
+}
+
 // TODO(bgruber): remove in CCCL 4.0 when we drop the reduce dispatchers
 template <typename AccumT, typename OffsetT, typename ReductionOpT>
 struct policy_hub
@@ -404,6 +439,22 @@ struct policy_selector
   [[nodiscard]] _CCCL_HOST_DEVICE_API constexpr auto get_two_phase_tuning(::cuda::compute_capability cc) const
     -> ReducePolicy
   {
+    if (cc >= ::cuda::compute_capability{10, 7})
+    {
+      // sm_107 values are raw measured values and are deliberately NOT passed through scale_mem_bound
+      if (const auto sm107_tuning = get_sm107_tuning(accum_t, operation_t, offset_size, accum_size))
+      {
+        const auto rp = ReducePassPolicy{
+          sm107_tuning->threads,
+          sm107_tuning->items,
+          sm107_tuning->items_per_vec_load,
+          BLOCK_REDUCE_WARP_REDUCTIONS,
+          LOAD_LDG};
+        return {rp, rp};
+      }
+      // fall through to the sm100 tunings for shapes not measured on R200
+    }
+
     // if we don't have a tuning for sm100, fall through
     auto sm100_tuning = get_sm100_tuning(accum_t, operation_t, offset_size, accum_size);
     if (cc >= ::cuda::compute_capability{10, 0} && sm100_tuning)
