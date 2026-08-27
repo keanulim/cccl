@@ -112,6 +112,15 @@ void test_unordered_set()
   }
   assert(cudaStreamDestroy(handle) == cudaSuccess);
 }
+
+void test()
+{
+  test_types();
+  test_stream_id_hash();
+  test_stream_ref_hash();
+  test_stream_hash();
+  test_unordered_set();
+}
 } // namespace
 
 #endif // _CCCL_HAS_HOST_STD_LIB()
@@ -119,8 +128,7 @@ void test_unordered_set()
 int main(int, char**)
 {
 #if _CCCL_HAS_HOST_STD_LIB()
-  NV_IF_TARGET(NV_IS_HOST,
-               (test_types(); test_stream_id_hash(); test_stream_ref_hash(); test_stream_hash(); test_unordered_set();))
+  NV_IF_TARGET(NV_IS_HOST, test());
 #endif // _CCCL_HAS_HOST_STD_LIB()
 
   return 0;
