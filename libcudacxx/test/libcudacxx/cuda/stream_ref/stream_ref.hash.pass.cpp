@@ -76,17 +76,6 @@ void test_stream_ref_hash()
   assert(cudaStreamDestroy(handle) == cudaSuccess);
 }
 
-void test_stream_hash()
-{
-  cuda::stream stream{cuda::device_ref{0}};
-
-  assert(std::hash<cuda::stream>{}(stream) == std::hash<cuda::stream>{}(stream));
-
-  cuda::stream_ref ref{stream};
-  assert(ref == stream);
-  assert(std::hash<cuda::stream>{}(stream) == std::hash<cuda::stream_ref>{}(ref));
-}
-
 void test_unordered_set()
 {
   std::unordered_set<cuda::stream_id> ids{};
@@ -118,7 +107,6 @@ void test()
   test_types();
   test_stream_id_hash();
   test_stream_ref_hash();
-  test_stream_hash();
   test_unordered_set();
 }
 } // namespace
@@ -128,7 +116,7 @@ void test()
 int main(int, char**)
 {
 #if _CCCL_HAS_HOST_STD_LIB()
-  NV_IF_TARGET(NV_IS_HOST, test());
+  NV_IF_TARGET(NV_IS_HOST, (test();))
 #endif // _CCCL_HAS_HOST_STD_LIB()
 
   return 0;

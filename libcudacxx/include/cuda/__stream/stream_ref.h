@@ -347,7 +347,7 @@ _CCCL_BEGIN_NAMESPACE_STD
 template <>
 struct hash<::cuda::stream_id>
 {
-  [[nodiscard]] _CCCL_HOST_API constexpr size_t _CCCL_STATIC_CALL_OPERATOR(::cuda::stream_id __id) noexcept
+  [[nodiscard]] _CCCL_HOST_API size_t _CCCL_STATIC_CALL_OPERATOR(::cuda::stream_id __id) noexcept
   {
     return ::std::hash<::cuda::std::underlying_type_t<::cuda::stream_id>>{}(::cuda::std::to_underlying(__id));
   }
